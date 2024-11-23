@@ -1,0 +1,36 @@
+<section>
+     <!-- Título da Receita e Usuário -->
+     <div class="bg-light-tertiary-container text-white p-4 flex">
+          <div>
+               <p class="font-light">{{recipe.userName}}</p> <!-- Nome do usuário -->
+               <p class="text-xl font-display">{{recipe.title}}</p> <!-- Título da receita -->
+          </div>
+     </div>
+
+     <!-- Tags -->
+     <div class="flex flex-wrap gap-2 py-4">
+          {{#each recipe.tags}}
+               {{> tag text=this.text color=this.color}}
+          {{/each}}
+     </div>
+
+     <section class="mt-4 space-y-6">
+          <!-- Ingredientes -->
+          <div class="bg-light-surface-variant px-4 py-2 rounded-lg">
+               <p class="font-display font-medium text-lg">Ingredientes</p>
+               <p class="py-1 font-light">{{recipe.ingredients}}</p>
+          </div>
+
+          <!-- Preparo -->
+          <div class="bg-light-surface-variant px-4 py-2 rounded-lg">
+               <p class="font-display font-medium text-lg">Preparo</p>
+               <p class="py-1 font-light">{{recipe.preparing}}</p>
+          </div>
+
+          <!-- Tempo de preparo -->
+          <div class="bg-light-surface-variant px-4 py-2 rounded-lg">
+               <p class="font-display font-medium text-lg">Tempo de preparo</p>
+               <p class="py-1 font-light">{{recipe.preparingTime}}</p>
+          </div>
+     </section>
+</section>

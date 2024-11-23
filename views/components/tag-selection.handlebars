@@ -1,0 +1,17 @@
+<section class="py-4">
+     <h2 class="text-lg font-display font-semibold mb-4">Escolha Tags para sua receita</h2>
+
+     <!-- Seleção de tags -->
+     <div class="space-y-6">
+          {{#each filters}}
+          <div class="space-y-1">
+               <p class="font-medium">{{this.name}}</p> <!-- Nome do grupo -->
+               <div class="flex flex-wrap gap-2">
+                    {{#each this.tags}}
+                         {{> tag-button text=this.name color=this.color}}
+                    {{/each}}
+               </div>
+          </div>
+          {{/each}}
+     </div>
+</section>

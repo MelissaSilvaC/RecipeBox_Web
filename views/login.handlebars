@@ -1,0 +1,101 @@
+<section>
+     <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+          <div class="flex flex-col items-center">
+               <img src="/icons/box_fill.svg" alt="RecipeBox Logo" class="h-20 w-20">
+               <h2 class="mt-6 text-center text-2xl/9 font-semibold text-light-primary-container">
+                    Bem vindo de volta!
+               </h2>
+          </div>
+
+          <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+               <form id="loginForm" method="POST" action="/login" class="space-y-6">
+                    <!-- Campo de Email -->
+                    <div>
+                         <label for="email" class="block text-sm/6 font-medium text-gray-900">Email</label>
+                         <div class="mt-2">
+                              <input id="email" name="email" type="email" autocomplete="email" required
+                                   class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
+                         </div>
+                    </div>
+
+                    <!-- Campo de Senha -->
+                    <div>
+                         <label for="password" class="block text-sm/6 font-medium text-gray-900">Senha</label>
+                         <div class="mt-2">
+                              <input id="password" name="password" type="password" autocomplete="current-password"
+                                   required
+                                   class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
+                         </div>
+                    </div>
+
+                    <!-- Mensagem de Erro -->
+                    <div id="errorMessage" class="text-red-600 text-sm/6 mt-2 hidden">Erro ao fazer login</div>
+
+                    <!-- Botão de Login -->
+                    <div>
+                         <button type="submit"
+                              class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                              Entrar
+                         </button>
+                    </div>
+               </form>
+
+               <p class="mt-10 text-center text-sm/6 text-gray-500">
+                    Não tem uma conta?
+                    <a href="/register" class="font-semibold text-light-primary-container hover:text-light-secondary">
+                         Cadastre-se
+                    </a>
+               </p>
+          </div>
+     </div>
+</section>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+<script>
+     const firebaseConfig = {
+          apiKey: "AIzaSyBXM2_1zeUd6bzvLf5swROTStBSvf5FfQc",
+          authDomain: "recipebox-81a2c.firebaseapp.com",
+          projectId: "recipebox-81a2c",
+          storageBucket: "recipebox-81a2c.firebasestorage.app",
+          messagingSenderId: "360760255880",
+          appId: "1:360760255880:web:8d0786bf2942f9a4a4863d"
+     };
+     firebase.initializeApp(firebaseConfig);
+     const auth = firebase.auth();
+</script>
+<script>
+      async function login(event) {
+               event.preventDefault(); // Evita o comportamento padrão do formulário
+
+               const email = document.getElementById("email").value;
+               const password = document.getElementById("password").value;
+               const errorMessage = document.getElementById("errorMessage");
+
+               try {
+                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                    const token = await userCredential.user.getIdToken(); // Obtém o token JWT do Firebase
+
+                    // Envia o token JWT ao backend
+                    const response = await fetch('/login', {
+                         method: 'POST',
+                         headers: { 'Content-Type': 'application/json' },
+                         body: JSON.stringify({ token })
+                    });
+
+                    if (response.ok) {
+                         window.location.href = '/'; // Redireciona para a página principal
+                    } else {
+                         const result = await response.json();
+                         errorMessage.textContent = result.message || "Falha na autenticação. Verifique suas credenciais.";
+                         errorMessage.classList.remove("hidden");
+                    }
+               } catch (error) {
+                    console.error("Erro ao fazer login:", error);
+                    errorMessage.textContent = "Erro ao fazer login. Verifique suas credenciais.";
+                    errorMessage.classList.remove("hidden");
+               }
+          }
+
+          // Vincula o evento de envio do formulário à função de login
+          document.getElementById("loginForm").addEventListener("submit", login);
+</script>

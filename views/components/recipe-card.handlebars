@@ -1,0 +1,13 @@
+<a href="/details/{{id}}">
+     <div class="p-4 bg-light-surface-container rounded-tl-3xl rounded-ee-3xl shadow-sm hover:cursor-pointer hover:bg-light-surface-dim">
+          <h3 class="text-lg font-medium font-display mb-4">{{title}}</h3>
+          <div class="flex flex-wrap gap-2">
+               {{#each tags}}
+                    {{> tag text=this.text color=this.color}}
+               {{/each}}
+          </div>
+     </div>
+     <a href="/edit/{{id}}"><button class="hover:animate-ping my-2 mb-8"> <img src="/icons/edit.svg" class=""> </button></a>
+     <a href="/delete/{{id}}"><button class="hover:animate-ping my-2 mb-8"> <img src="/icons/delete.svg" class=""> </button></a>
+</a>
+

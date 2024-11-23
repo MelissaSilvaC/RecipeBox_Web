@@ -1,0 +1,16 @@
+<section class="flex flex-col justify-center">
+     <!-- Barra de Pesquisa -->
+     {{> search-bar query=searchFeed}}
+
+     <!-- Feed de Receitas -->
+     <div class="mt-12 space-y-4">
+          {{#each feed}}
+               {{> feed-recipe-card 
+                    userName=this.userName
+                    title=this.title 
+                    preparing=this.preparing
+                    tags=this.tags 
+               }}
+          {{/each}}
+     </div>
+</section>

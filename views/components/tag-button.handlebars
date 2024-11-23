@@ -1,0 +1,16 @@
+<label>
+     <input 
+          type="checkbox" 
+          name="tags" 
+          value="{{text}}" 
+          class="hidden" 
+          {{#if selected}}checked{{/if}} 
+     />
+     <button 
+          type="button" 
+          class="px-3 py-1 rounded-xl text-white {{#if selected}}ring-4 ring-offset-2{{/if}}"
+          style="background-color: {{color}}; opacity: {{#if selected}}1{{else}}0.55{{/if}};" 
+          data-tag="{{text}}">
+          {{text}}
+     </button>
+</label>

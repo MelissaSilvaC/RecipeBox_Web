@@ -1,0 +1,17 @@
+<a href="/details/{{id}}">
+     <div class="bg-light-surface-container rounded-xl shadow-sm mb-8 hover:bg-light-surface-dim hover:cursor-pointer">
+          <div class="bg-light-tertiary-container flex rounded-t-xl pl-4 py-1">
+               <img id="profileIcon" src="/icons/feed_profile.svg" alt="RecipeBox User" class="cursor-pointer">
+               <p class="text-white py-2 pl-2">{{ userName }}</p>
+          </div>
+          <div class="px-6 py-4 space-y-2">
+               <h3 class="text-lg font-medium font-display">{{ title }}</h3>
+               <p class="text-light-primary-fixed text-sm pb-2">{{ preparing }}</p>
+               <div class="flex flex-wrap gap-2">
+                    {{#each tags}}
+                         {{> tag text=this.text color=this.color}}
+                    {{/each}}
+               </div>
+          </div>
+     </div>
+</a>

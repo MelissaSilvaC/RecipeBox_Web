@@ -1,0 +1,75 @@
+<section>
+     <form class="space-y-6" action="/update/{{id}}" method="POST">
+          <!-- Título -->
+          <div>
+               <label for="title" class="block text-sm/6 font-medium text-gray-900">Título</label>
+               <div class="mt-2">
+                    <input id="title" name="title" type="text" value="{{recipe.title}}" required
+                         class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
+               </div>
+          </div>
+
+          <!-- Ingredientes -->
+          <div class="col-span-full">
+               <label for="ingredients" class="block text-sm/6 font-medium text-gray-900">Ingredientes</label>
+               <div class="mt-2">
+                    <textarea id="ingredients" name="ingredients" rows="3"
+                         class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">{{recipe.ingredients}}</textarea>
+               </div>
+          </div>
+
+          <!-- Preparo -->
+          <div class="col-span-full">
+               <label for="preparing" class="block text-sm/6 font-medium text-gray-900">Preparo</label>
+               <div class="mt-2">
+                    <textarea id="preparing" name="preparing" rows="3"
+                         class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">{{recipe.preparing}}</textarea>
+               </div>
+          </div>
+
+          <!-- Tempo de preparo -->
+          <div>
+               <div class="flex items-center justify-between">
+                    <label for="preparingtime" class="block text-sm/6 font-medium text-gray-900">Tempo de
+                         preparo</label>
+               </div>
+               <div class="mt-2">
+                    <input id="preparingtime" name="preparingtime" type="text" value="{{recipe.preparingTime}}" required
+                         class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
+               </div>
+          </div>
+
+          <!-- Tags -->
+          {{> tag-selection filters=this.filters }}
+
+          <!-- Botão de enviar -->
+          <div>
+               <button type="submit"
+                    class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Salvar Edição</button>
+          </div>
+     </form>
+</section>
+<script>
+     document.addEventListener("DOMContentLoaded", () => {
+               const tagButtons = document.querySelectorAll("button[data-tag]");
+
+               tagButtons.forEach(button => {
+                    button.addEventListener("click", () => {
+                         // Encontre o checkbox associado
+                         const checkbox = button.previousElementSibling;
+
+                         // Alternar seleção
+                         checkbox.checked = !checkbox.checked;
+
+                         // Alterar estado visual
+                         if (checkbox.checked) {
+                              button.style.opacity = "1"; // Selecionado
+                              button.classList.add("ring-4", "ring-offset-2");
+                         } else {
+                              button.style.opacity = "0.55"; // Deselecionado
+                              button.classList.remove("ring-4", "ring-offset-2");
+                         }
+                    });
+               });
+          });
+</script>

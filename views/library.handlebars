@@ -1,0 +1,16 @@
+<section class="flex flex-col justify-center">
+     {{> search-bar query=search}}
+     <div class="mt-12 space-y-6">
+          {{#if recipes.length}}
+               {{#each recipes}}
+                    {{> recipe-card
+                         tags= this.tags
+                         title= this.title
+                         id= this.id
+                    }}
+               {{/each}}
+          {{else}}
+               <p class="text-gray-600 text-center">Você ainda não tem receitas cadastradas.</p>
+          {{/if}}
+     </div>
+</section>
