@@ -24,10 +24,10 @@
                          href="/create">Nova Receita +</a></button>
                <ul class="flex space-x-6">
                     <a href="/">
-                         <li class="hover:text-light-primary">Feed</li>
+                         <li class="hover:text-light-primary active:text-light-primary">Feed</li>
                     </a>
                     <a href="/library">
-                         <li class="hover:text-light-primary">Minha Biblioteca</li>
+                         <li class="hover:text-light-primary active:text-light-primary">Minha Biblioteca</li>
                     </a>
                </ul>
                <section class="relative">
@@ -61,10 +61,9 @@
           const userName = document.getElementById("userName");
           const logoutButton = document.getElementById("logoutButton");
 
-          // Função para buscar os dados do usuário
           const fetchUserData = async () => {
                try {
-                    const response = await fetch('/me', { credentials: 'include' }); // Garante que o cookie será enviado
+                    const response = await fetch('/me', { credentials: 'include' });
                     if (response.ok) {
                          const user = await response.json();
                          userName.textContent = user.name || "Usuário Anônimo";
@@ -76,7 +75,7 @@
                }
           };
 
-          fetchUserData(); // Executa a função ao carregar a página
+          fetchUserData();
 
           // Alterna a visibilidade do menu ao clicar no ícone de perfil
           profileIcon.addEventListener("click", () => {

@@ -61,13 +61,18 @@ app.get("/", isAuthenticated, async function (req, res) {
      snapshot.forEach(doc => {
           const data = doc.data();
 
-          // Processa as tags para separar título e cor
+          // Processando as tags para separar título e cor
           if (data.tags && Array.isArray(data.tags)) {
                data.tags = data.tags.map(tag => {
                     const [text] = tag.split(',').map(str => str.trim());
                     const color = getTagColor(text);
                     return { text, color };
                });
+          }
+
+          // Reduzindo o campo "preparing"
+          if (data.preparing && data.preparing.length > 180) {
+               data.preparing = data.preparing.substring(0, 180) + "...";
           }
 
           if (!search || data.title.toLowerCase().includes(search)) {
@@ -105,13 +110,11 @@ app.get("/library", isAuthenticated, async function (req, res) {
 
           res.render("library", { layout: 'main', recipes: recipelist, query: search, route: '/library' });
      } catch (error) {
-          console.error("Erro ao consultar o Firestore:", error);
           res.status(500).send("Erro ao carregar a biblioteca.");
      }
 });
 
-
-app.get('/details/:id', async (req, res) => {
+app.get('/details/:id', isAuthenticated, async (req, res) => {
      const id = req.params.id;
      const docRef = db.collection("Recipe").doc(id);
      const doc = await docRef.get();
@@ -132,42 +135,34 @@ app.get('/details/:id', async (req, res) => {
      }
 });
 
-app.get('/create', (req, res) => {
+app.get('/create', isAuthenticated, (req, res) => {
      res.render('createRecipe', { layout: 'main', filters: filters });
 });
 
 app.post("/create", isAuthenticated, async function (req, res) {
      try {
           const { title, ingredients, preparing, preparingTime, tags } = req.body;
-          const userName = req.user.name;
-          const userEmail = req.user.email;
+          const user = req.user;
 
-          // Valida campos obrigatórios
-          if (!title || !ingredients || !preparing || !preparingTime) {
-               return res.status(400).send("Todos os campos são obrigatórios.");
-          }
+          const tagsArray = JSON.parse(tags);
 
-          // Garante que tags sejam sempre um array
-          const processedTags = Array.isArray(tags) ? tags : tags ? [tags] : [];
-
-          await db.collection("Recipe").add({
-               title,
-               ingredients,
-               preparing,
-               preparingTime,
-               tags: processedTags,
-               userName,
-               userEmail,
+          await db.collection('Recipe').add({
+               userEmail: user.email,
+               userName: user.name,
+               title: title,
+               ingredients: ingredients,
+               preparing: preparing,
+               preparingTime: preparingTime,
+               tags: tagsArray, 
           });
 
-          res.redirect("/library"); // Redireciona para a biblioteca
+          res.redirect("/library");
      } catch (error) {
           console.error("Erro ao criar receita:", error);
-          res.status(500).send("Erro ao criar a receita.");
      }
 });
 
-app.get("/edit/:id", function (req, res) {
+app.get("/edit/:id", isAuthenticated, function (req, res) {
      const id = req.params.id;
      var docRef = db.collection("Recipe").doc(id);
 
@@ -187,17 +182,15 @@ app.get("/edit/:id", function (req, res) {
 
                res.render("editRecipe", { recipe: recipe, id: id, filters: updatedFilters });
           } else {
-               console.log("Receita não encontrada.");
                res.status(404).send("Receita não encontrada.");
           }
      }).catch((error) => {
-          console.log("Erro ao buscar receita:", error);
           res.status(500).send("Erro interno ao buscar receita.");
      });
 });
 
 
-app.get("/delete/:id", async function (req, res) {
+app.get("/delete/:id", isAuthenticated, async function (req, res) {
      const id = req.params.id;
      try {
           await db.collection('Recipe').doc(id).delete();
@@ -207,7 +200,7 @@ app.get("/delete/:id", async function (req, res) {
      }
 })
 
-app.post("/update/:id", function (req, res) {
+app.post("/update/:id", isAuthenticated, function (req, res) {
      const id = req.params.id;
      var docRef = db.collection("Recipe").doc(id);
 
@@ -227,7 +220,6 @@ app.post("/update/:id", function (req, res) {
           })
           .catch((error) => {
                console.error("Erro ao atualizar receita:", error);
-               res.status(500).send("Erro ao atualizar a receita.");
           });
 });
 
