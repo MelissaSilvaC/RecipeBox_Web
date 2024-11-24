@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const path = require('path');
 const Handlebars = require("handlebars");
 const { filters, getTagColor } = require('./public/js/filters');
-const { isAuthenticated, registerUser, loginUser, logoutUser, db, me } = require('./auth'); // Importando Firebase Auth
+const { isAuthenticated, registerUser, loginUser, logoutUser, db, me } = require('./auth');
 
 const app = express();
 
@@ -31,21 +31,25 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // ==================== ROTAS ====================
 
+// ==================== AUTENTICAÇÃO ====================
+
 app.get('/login', (req, res) => {
-     res.render('login', { layout: 'auth' });
+     res.render('login', { layout: 'auth' })
 });
 
 app.get('/register', (req, res) => {
-     res.render('register', { layout: 'auth' });
+     res.render('register', { layout: 'auth' })
 });
 
-app.post('/register', registerUser);
+app.post('/register', (req, res) => { registerUser(req, res) });
 
 app.post('/login', loginUser);
 
 app.get('/logout', logoutUser);
 
 app.get('/me', isAuthenticated, me);
+
+// ==================== AUTENTICAÇÃO ====================
 
 app.get("/", isAuthenticated, async function (req, res) {
      const search = req.query.search ? req.query.search.toLowerCase() : "";
@@ -74,18 +78,18 @@ app.get("/", isAuthenticated, async function (req, res) {
      res.render('index', { layout: 'main', feed: recipelist, query: search, route: '/' });
 });
 
-
 app.get("/library", isAuthenticated, async function (req, res) {
      try {
           const search = req.query.search ? req.query.search.toLowerCase() : "";
-          const recipes = db.collection('Recipe');
+          const userEmail = req.user.email;
+
+          const recipes = db.collection('Recipe').where('userEmail', '==', userEmail);
           const snapshot = await recipes.get();
 
           const recipelist = [];
           snapshot.forEach(doc => {
                const data = doc.data();
 
-               // Processa as tags para separar título e cor
                if (data.tags && Array.isArray(data.tags)) {
                     data.tags = data.tags.map(tag => {
                          const [text] = tag.split(',').map(str => str.trim());
@@ -104,8 +108,8 @@ app.get("/library", isAuthenticated, async function (req, res) {
           console.error("Erro ao consultar o Firestore:", error);
           res.status(500).send("Erro ao carregar a biblioteca.");
      }
-
 });
+
 
 app.get('/details/:id', async (req, res) => {
      const id = req.params.id;
@@ -129,24 +133,39 @@ app.get('/details/:id', async (req, res) => {
 });
 
 app.get('/create', (req, res) => {
-
      res.render('createRecipe', { layout: 'main', filters: filters });
 });
 
-app.post("/create", function (req, res) {
-     /**
-      * var result = db.collection('agendamentos').add({
-          nome: req.body.nome,
-          telefone: req.body.telefone,
-          origem: req.body.origem,
-          data_contato: req.body.data_contato,
-          observacao: req.body.observacao
-     }).then(function () {
-          console.log('Added document');
-          res.redirect('/')
-     })
-      */
-})
+app.post("/create", isAuthenticated, async function (req, res) {
+     try {
+          const { title, ingredients, preparing, preparingTime, tags } = req.body;
+          const userName = req.user.name;
+          const userEmail = req.user.email;
+
+          // Valida campos obrigatórios
+          if (!title || !ingredients || !preparing || !preparingTime) {
+               return res.status(400).send("Todos os campos são obrigatórios.");
+          }
+
+          // Garante que tags sejam sempre um array
+          const processedTags = Array.isArray(tags) ? tags : tags ? [tags] : [];
+
+          await db.collection("Recipe").add({
+               title,
+               ingredients,
+               preparing,
+               preparingTime,
+               tags: processedTags,
+               userName,
+               userEmail,
+          });
+
+          res.redirect("/library"); // Redireciona para a biblioteca
+     } catch (error) {
+          console.error("Erro ao criar receita:", error);
+          res.status(500).send("Erro ao criar a receita.");
+     }
+});
 
 app.get("/edit/:id", function (req, res) {
      const id = req.params.id;
@@ -213,6 +232,7 @@ app.post("/update/:id", function (req, res) {
 });
 
 // ==================== SERVIDOR ====================
+
 app.listen(8081, function () {
      console.log("Servidor ativo! Clique na URL: http://localhost:8081");
 });

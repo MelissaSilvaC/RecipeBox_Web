@@ -1,7 +1,7 @@
 <section>
      <form class="space-y-6" action="#" method="POST">
           <div>
-               <label for="title" class="block text-sm/6 font-medium text-gray-900">Titulo</label>
+               <label for="title" class="block text-sm/6 font-medium text-gray-900">Título</label>
                <div class="mt-2">
                     <input id="title" name="title" type="teste" required
                          class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
@@ -29,29 +29,29 @@
                     <label for="preparingtime" class="block text-sm/6 font-medium text-gray-900">Tempo de preparo</label>
                </div>
                <div class="mt-2">
-                    <input id="preparingtime" name="preparingtime" type="text" autocomplete="current-password" required
+                    <input id="preparingtime" name="preparingTime" type="text" required
                          class="block w-full rounded-md border-0 p-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-light-primary-container sm:text-sm/6">
                </div>
           </div>
 
           {{> tag-selection filters=this.filters }}
+          <!-- Campo oculto para enviar tags -->
+          <input type="hidden" name="tags" id="selectedTags">
           
-          <div>
-               <button type="submit"
-                    class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Cadastrar</button>
-          </div>
+          <button type="submit"
+               class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Adicionar Receita</button>
      </form>
 </section>
 <script>
      document.addEventListener("DOMContentLoaded", () => {
                const tagButtons = document.querySelectorAll("button[data-tag]");
-               const selectedTags = new Set(); // Usando Set para evitar duplicados
+               const selectedTags = new Set();
+               const selectedTagsInput = document.getElementById("selectedTags");
 
                tagButtons.forEach(button => {
                     button.addEventListener("click", (event) => {
-                         event.preventDefault(); // Impede que o clique no botão envie o formulário
+                         event.preventDefault();
 
-                         // Alternar estado visual
                          if (button.style.opacity === "1") {
                               button.style.opacity = "0.55"; // Deselecionado
                               selectedTags.delete(button.dataset.tag); // Remover tag do Set
@@ -60,7 +60,7 @@
                               selectedTags.add(button.dataset.tag); // Adicionar tag ao Set
                          }
 
-                         console.log([...selectedTags]); // Exibir tags selecionadas
+                         selectedTagsInput.value = Array.from(selectedTags).join(",");
                     });
                });
           });

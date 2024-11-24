@@ -7,7 +7,7 @@
           </div>
 
           <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-               <form method="POST" action="/register" class="space-y-6">
+               <form id="registerForm" method="POST" action="/register" class="space-y-6">
                     <div>
                          <label for="name" class="block text-sm/6 font-medium text-gray-900">Nome</label>
                          <div class="mt-2">
@@ -45,8 +45,7 @@
 
                     <div>
                          <button type="submit"
-                              class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary hover:cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2"
-                              disabled>
+                              class="flex w-full justify-center rounded-md bg-light-tertiary-container px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-light-tertiary hover:cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2">
                               Cadastre-se
                          </button>
                     </div>
@@ -55,5 +54,46 @@
      </div>
 </section>
 <script>
-     
+     document.getElementById('registerForm').addEventListener('submit', async (event) => {
+          event.preventDefault();
+
+          const name = document.getElementById('name').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const password = document.getElementById('password').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          const errorMessage = document.getElementById('errorMessage');
+
+          if (!name || !email || !password || !confirmPassword) {
+               errorMessage.textContent = "Preencha todos os campos!";
+               errorMessage.classList.remove('hidden');
+               return;
+          }
+
+          if (password !== confirmPassword) {
+               errorMessage.textContent = "As senhas não coincidem!";
+               errorMessage.classList.remove('hidden');
+               return;
+          }
+
+          try {
+               const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password }),
+               });
+
+               if (response.ok) {
+                    window.location.href = '/login';
+               } else {
+                    const data = await response.json();
+                    errorMessage.textContent = data.message || "Erro ao registrar o usuário!";
+                    errorMessage.classList.remove('hidden');
+               }
+          } catch (error) {
+               console.error("Erro ao conectar com o backend:", error);
+               errorMessage.textContent = "Erro ao registrar o usuário!";
+               errorMessage.classList.remove('hidden');
+          }
+     });
 </script>

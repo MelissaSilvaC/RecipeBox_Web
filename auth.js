@@ -8,25 +8,22 @@ initializeApp({ credential: cert(serviceAccount) });
 const auth = getAuth();
 const db = getFirestore();
 
-
 async function isAuthenticated(req, res, next) {
-     const authToken = req.cookies.authToken || req.headers.authorization;
+     const authToken = req.cookies.authToken || req.headers.authorization
 
-     if (!authToken) {
-          return res.redirect('/login'); // Redireciona para o login se não estiver autenticado
-     }
+     if (!authToken) { return res.redirect('/login') }
 
      try {
-          const decodedToken = await auth.verifyIdToken(authToken);
+          const decodedToken = await auth.verifyIdToken(authToken)
           req.user = { 
                uid: decodedToken.uid, 
                email: decodedToken.email, 
                name: decodedToken.name
           }; // Adiciona os dados do usuário no req
-          next();
+          next()
      } catch (error) {
-          console.error("Erro na autenticação:", error);
-          res.redirect('/login'); // Redireciona para login em caso de falha
+          console.error("Erro na autenticação:", error)
+          res.redirect('/login')
      }
 }
 
@@ -34,7 +31,7 @@ async function registerUser(req, res) {
      const { name, email, password } = req.body;
 
      if (!name || !email || !password) {
-          return res.status(400).send("Preencha todos os campos!");
+          return res.status(400).json({ message: "Preencha todos os campos!" });
      }
 
      try {
@@ -44,42 +41,44 @@ async function registerUser(req, res) {
                password,
           });
 
-          // Salva o usuário no Firestore
           const userRef = db.collection('usuarios').doc(userRecord.uid);
           await userRef.set({
                email,
-               nome: name,
+               name,
           });
 
-          res.redirect('/login');
+          res.status(201).json({ message: "Usuário registrado com sucesso!" });
      } catch (error) {
           console.error("Erro ao registrar o usuário:", error);
-          res.status(500).send("Erro ao registrar o usuário.");
+
+          if (error.code === 'auth/email-already-exists') {
+               return res.status(400).json({ message: "Este e-mail já está em uso." });
+          }
+
+          res.status(500).json({ message: "Erro ao registrar o usuário." });
      }
 }
 
+
 async function loginUser(req, res) {
-     const { token } = req.body;
+     const { token } = req.body
 
      try {
-          const decodedToken = await auth.verifyIdToken(token);
-          const uid = decodedToken.uid;
+          const decodedToken = await auth.verifyIdToken(token)
+          const uid = decodedToken.uid
 
-          // Verifique se o usuário existe no Firestore
-          const userRef = db.collection('usuarios').doc(uid);
+          const userRef = db.collection('usuarios').doc(uid)
           const userDoc = await userRef.get();
 
           if (!userDoc.exists) {
-               // Crie o usuário se não existir
                await userRef.set({
                     email: decodedToken.email || "Usuário",
                     nome: decodedToken.name
                });
           }
 
-          // Define o token no cookie
           res.cookie('authToken', token, { httpOnly: true, secure: true });
-          res.redirect('/'); // Redireciona para a página inicial
+          res.redirect('/');
      } catch (error) {
           console.error('Erro ao verificar o token:', error);
           res.status(401).json({ success: false, message: 'Falha na autenticação' });

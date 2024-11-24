@@ -64,35 +64,35 @@
      const auth = firebase.auth();
 </script>
 <script>
-      async function login(event) {
-               event.preventDefault();
+     async function login(event) {
+          event.preventDefault();
 
-               const email = document.getElementById("email").value;
-               const password = document.getElementById("password").value;
-               const errorMessage = document.getElementById("errorMessage");
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const errorMessage = document.getElementById("errorMessage");
 
-               try {
-                    const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    const token = await userCredential.user.getIdToken();
-                    const response = await fetch('/login', {
-                         method: 'POST',
-                         headers: { 'Content-Type': 'application/json' },
-                         body: JSON.stringify({ token })
-                    });
+          try {
+               const userCredential = await auth.signInWithEmailAndPassword(email, password);
+               const token = await userCredential.user.getIdToken();
+               const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ token })
+               });
 
-                    if (response.ok) {
-                         window.location.href = '/';
-                    } else {
-                         const result = await response.json();
-                         errorMessage.textContent = result.message || "Falha na autenticação. Verifique suas credenciais.";
-                         errorMessage.classList.remove("hidden");
-                    }
-               } catch (error) {
-                    console.error("Erro ao fazer login:", error);
-                    errorMessage.textContent = "Erro ao fazer login. Verifique suas credenciais.";
+               if (response.ok) {
+                    window.location.href = '/';
+               } else {
+                    const result = await response.json();
+                    errorMessage.textContent = result.message || "Falha na autenticação. Verifique suas credenciais.";
                     errorMessage.classList.remove("hidden");
                }
+          } catch (error) {
+               console.error("Erro ao fazer login:", error);
+               errorMessage.textContent = "Erro ao fazer login. Verifique suas credenciais.";
+               errorMessage.classList.remove("hidden");
           }
+     }
 
-          document.getElementById("loginForm").addEventListener("submit", login);
+     document.getElementById("loginForm").addEventListener("submit", login);
 </script>
