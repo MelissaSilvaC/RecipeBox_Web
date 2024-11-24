@@ -65,7 +65,7 @@
 </script>
 <script>
       async function login(event) {
-               event.preventDefault(); // Evita o comportamento padrão do formulário
+               event.preventDefault();
 
                const email = document.getElementById("email").value;
                const password = document.getElementById("password").value;
@@ -73,9 +73,7 @@
 
                try {
                     const userCredential = await auth.signInWithEmailAndPassword(email, password);
-                    const token = await userCredential.user.getIdToken(); // Obtém o token JWT do Firebase
-
-                    // Envia o token JWT ao backend
+                    const token = await userCredential.user.getIdToken();
                     const response = await fetch('/login', {
                          method: 'POST',
                          headers: { 'Content-Type': 'application/json' },
@@ -83,7 +81,7 @@
                     });
 
                     if (response.ok) {
-                         window.location.href = '/'; // Redireciona para a página principal
+                         window.location.href = '/';
                     } else {
                          const result = await response.json();
                          errorMessage.textContent = result.message || "Falha na autenticação. Verifique suas credenciais.";
@@ -96,6 +94,5 @@
                }
           }
 
-          // Vincula o evento de envio do formulário à função de login
           document.getElementById("loginForm").addEventListener("submit", login);
 </script>
